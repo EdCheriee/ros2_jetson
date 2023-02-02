@@ -210,7 +210,7 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 # 
 # setup entrypoint
 #
-COPY ./packages/ros_entrypoint.sh /ros_entrypoint.sh
+COPY ./ros_entrypoint.sh /ros_entrypoint.sh
 
 RUN sed -i \
     's/ros_env_setup="\/opt\/ros\/$ROS_DISTRO\/setup.bash"/ros_env_setup="${ROS_ROOT}\/install\/setup.bash"/g' \
@@ -221,21 +221,21 @@ RUN echo 'source ${ROS_ROOT}/install/setup.bash' >> /root/.bashrc
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
-WORKDIR /
+WORKDIR .
 
-# COPY ./jetson-containers/scripts/opencv_install_deps.sh opencv_install_deps.sh
-# RUN chmod +x opencv_install_deps.sh && ./opencv_install_deps.sh
+COPY ./jetson-containers/scripts/opencv_install_deps.sh opencv_install_deps.sh
+RUN chmod +x opencv_install_deps.sh && ./opencv_install_deps.sh
 # #
 # # OpenCV - https://github.com/mdegans/nano_build_opencv/blob/master/build_opencv.sh
 # #
 
 # # install build dependencies
 
-# RUN apt install nano
+RUN apt install nano
 
-# WORKDIR /camera_test
-# VOLUME ./CSI-Camera/images
+WORKDIR /camera_test
+VOLUME ./CSI-Camera/images
 
-# COPY ./CSI-Camera ./CSI-Camera/
+COPY --chown=${USER} ./CSI-Camera ./CSI-Camera/
 
-# RUN cd CSI-Camera && cmake . && make
+RUN cd CSI-Camera && cmake . && make
